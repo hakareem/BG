@@ -1,4 +1,4 @@
-#BG
+# BG
 Breakout game written entirely in pure JavaScript and rendered on HTML5 Canvas.
 
 • Your game should have a single screen with 8 rows of bricks, a paddle, and a ball.  <br>
