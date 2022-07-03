@@ -26,6 +26,7 @@ const brickOffsetLeft = 30;
 // Starting position of the paddle
 const paddleXStart = (width - paddleWidth) / 2;
 const PI2 = Math.PI * 2;
+const gameOverMessage = "Game Over!";
 // Game colours
 const ballColor = "orange";
 const bricksColor = "blue";
@@ -34,15 +35,54 @@ const livesColor = "white";
 const scoreColor = "white";
 
 //----------------------------------------------------------------------
+// Classes
+//----------------------------------------------------------------------
+class Ball {
+  x = 0;
+  y = 0;
+  dx = 2;
+  dy = -2;
+  radius = 10;
+  color;
+  constructor(x, y, dx, dy, radius, color) {
+    this.x = x;
+    this.y = y;
+    this.dx = dx;
+    this.dy = dy;
+    this.raduis = radius;
+    this.color = color;
+  }
+  drawBall(ctx) {
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.radius, 0, PI2);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+    ctx.closePath();
+  }
+}
+let ball = new Ball(0, 0, 2, -2, 10, ballColor);
+
+class Brick {
+  constructor(x, y, width, height, color) {
+    this.x = x;
+    this.y = y;
+    this.status = 1;
+    this.width = width;
+    this.height = height;
+    this.color = color;
+  }
+  drawBricks(ctx) {
+    ctx.beginPath();
+    ctx.rect(this.x, this.y, this.width, this.height);
+    ctx.fillStyle = bricksColor;
+    ctx.fill();
+    ctx.closePath();
+  }
+}
+
+//----------------------------------------------------------------------
 // Let Variables
 //----------------------------------------------------------------------
-
-let ball = {
-  x: 0,
-  y: 0,
-  dx: 0,
-  dy: 0,
-};
 
 let paddleX;
 resetBallAndPaddle();
@@ -56,15 +96,8 @@ let leftPressed = false;
 // Setup Bricks Array
 //----------------------------------------------------------------------
 
-//2d array containing columns and rows that will contain the x and y positions to paint each brick
 const bricks = [];
-for (let c = 0; c < brickColumnCount; c++) {
-  bricks[c] = [];
-  for (let r = 0; r < brickRowCount; r++) {
-    // Status parameter to indicate whether I want to paint each brick on the screen or not
-    bricks[c][r] = { x: 0, y: 0, status: 1 };
-  }
-}
+initialiseBricks();
 
 //----------------------------------------------------------------------
 // Event listeners
@@ -103,6 +136,25 @@ function mouseMoveHandler(e) {
 // Functions
 //----------------------------------------------------------------------
 
+function initialiseBricks() {
+  for (let c = 0; c < brickColumnCount; c++) {
+    bricks[c] = [];
+    for (let r = 0; r < brickRowCount; r++) {
+      // Work out the x and y positions of each brick for each loop iteration to draw the bricks
+      let brickX = r * (brickWidth + brickPadding) + brickOffsetLeft;
+      let brickY = c * (brickHeight + brickPadding) + brickOffsetTop;
+      // Status parameter to indicate whether I want to paint each brick on the screen or not
+      bricks[c][r] = new Brick(
+        brickX,
+        brickY,
+        brickWidth,
+        brickHeight,
+        bricksColor
+      );
+    }
+  }
+}
+
 // Looping through all the bricks and compare brick's position with the ball's coordinates
 function collisionDetection() {
   for (let c = 0; c < brickColumnCount; c++) {
@@ -131,14 +183,6 @@ function collisionDetection() {
     }
   }
 }
-// Drawing the ball
-function drawBall() {
-  ctx.beginPath();
-  ctx.arc(ball.x, ball.y, ballRadius, 0, PI2);
-  ctx.fillStyle = ballColor;
-  ctx.fill();
-  ctx.closePath();
-}
 
 // Drawing the paddle
 function drawPaddle() {
@@ -153,18 +197,10 @@ function drawPaddle() {
 function drawBricks() {
   for (let c = 0; c < brickColumnCount; c++) {
     for (let r = 0; r < brickRowCount; r++) {
+      const brick = bricks[c][r];
       // If brick status is 1 then draw it - else it's been hit
-      if (bricks[c][r].status == 1) {
-        // Work out the x and y positions of each brick for each loop iteration to draw the bricks
-        let brickX = r * (brickWidth + brickPadding) + brickOffsetLeft;
-        let brickY = c * (brickHeight + brickPadding) + brickOffsetTop;
-        bricks[c][r].x = brickX;
-        bricks[c][r].y = brickY;
-        ctx.beginPath();
-        ctx.rect(brickX, brickY, brickWidth, brickHeight);
-        ctx.fillStyle = bricksColor;
-        ctx.fill();
-        ctx.closePath();
+      if (brick.status == 1) {
+        brick.drawBricks(ctx);
       }
     }
   }
@@ -209,13 +245,16 @@ function movePaddle() {
 
 function collisionsWithCanvasAndPaddle() {
   // Ball bouncing off the left and right of the canvas
-  if (ball.x + ball.dx > width - ballRadius || ball.x + ball.dx < ballRadius) {
+  if (
+    ball.x + ball.dx > width - ball.radius ||
+    ball.x + ball.dx < ball.radius
+  ) {
     ball.dx = -ball.dx;
   }
   // Ball bouncing off the top
-  if (ball.y + ball.dy < ballRadius) {
+  if (ball.y + ball.dy < ball.radius) {
     ball.dy = -ball.dy;
-  } else if (ball.y + ball.dy > height - ballRadius) {
+  } else if (ball.y + ball.dy > height - ball.radius) {
     // Collision detection between the ball and the paddle
     if (ball.x > paddleX && ball.x < paddleX + paddleWidth) {
       ball.dy = -ball.dy;
@@ -223,7 +262,7 @@ function collisionsWithCanvasAndPaddle() {
       lives--;
       // If there are no lives left, the game is over
       if (!lives) {
-        alert("GAME OVER");
+        alert(gameOverMessage);
         document.location.reload();
       } else {
         // Reset the position of the ball and paddle - along with the movement of the ball
@@ -242,7 +281,7 @@ function draw() {
   ctx.clearRect(0, 0, width, height);
   // Calling helper functions
   drawBricks();
-  drawBall();
+  ball.drawBall(ctx);
   drawPaddle();
   drawScore();
   drawLives();
