@@ -1,96 +1,127 @@
-//allows us to render graphics on the <canvas> element
-let canvas = document.getElementById("myCanvas");
-let ctx = canvas.getContext("2d"); // paint the canvas
+//----------------------------------------------------------------------
+// DOM references
+//----------------------------------------------------------------------
 
-//radius of the ball
-let ballRadius = 10;
-//position of the ball
-let x = canvas.width / 2;
-let y = canvas.height - 30;
-//variables to help with the movement of the ball
-let dx = 2;
-let dy = -2;
-//paddle variables
-let paddleHeight = 10;
-let paddleWidth = 75;
-let paddleX = (canvas.width - paddleWidth) / 2;
-//brick variables
-let brickRowCount = 8;
-let brickColumnCount = 4;
-let brickWidth = 45;
-let brickHeight = 20;
-let brickPadding = 10;
-let brickOffsetTop = 30;
-let brickOffsetLeft = 30;
-//score count
+// Allows us to render graphics on the <canvas> element
+const canvas = document.getElementById("myCanvas");
+const ctx = canvas.getContext("2d");
+
+//----------------------------------------------------------------------
+// Constant Variables
+//----------------------------------------------------------------------
+const width = canvas.width;
+const height = canvas.height;
+const ballRadius = 10;
+// Paddle variables
+const paddleHeight = 10;
+const paddleWidth = 75;
+// Brick variables
+const brickRowCount = 8;
+const brickColumnCount = 4;
+const brickWidth = 45;
+const brickHeight = 20;
+const brickPadding = 10;
+const brickOffsetTop = 30;
+const brickOffsetLeft = 30;
+// Starting position of the paddle
+const paddleXStart = (width - paddleWidth) / 2;
+const PI2 = Math.PI * 2;
+// Game colours
+const ballColor = "orange";
+const bricksColor = "blue";
+const paddleColor = "white";
+const livesColor = "white";
+const scoreColor = "white";
+
+//----------------------------------------------------------------------
+// Let Variables
+//----------------------------------------------------------------------
+
+let ball = {
+  x: 0,
+  y: 0,
+  dx: 0,
+  dy: 0,
+};
+
+let paddleX;
+resetBallAndPaddle();
 let score = 0;
-//lives count
 let lives = 5;
-//button control variables
+// Button control variables
 let rightPressed = false;
 let leftPressed = false;
 
+//----------------------------------------------------------------------
+// Setup Bricks Array
+//----------------------------------------------------------------------
+
 //2d array containing columns and rows that will contain the x and y positions to paint each brick
-let bricks = [];
+const bricks = [];
 for (let c = 0; c < brickColumnCount; c++) {
   bricks[c] = [];
   for (let r = 0; r < brickRowCount; r++) {
-    //status parameter to indicate whether I want to paint each brick on the screen or not
+    // Status parameter to indicate whether I want to paint each brick on the screen or not
     bricks[c][r] = { x: 0, y: 0, status: 1 };
   }
 }
 
-//event listeners for button presses
+//----------------------------------------------------------------------
+// Event listeners
+//----------------------------------------------------------------------
+
 document.addEventListener("keydown", keyDownHandler);
 document.addEventListener("keyup", keyUpHandler);
 document.addEventListener("mousemove", mouseMoveHandler);
 
-//paddle movement using key presses
 function keyDownHandler(e) {
-  if (e.key == "Right" || e.key == "ArrowRight") {
+  if (e.keyCode === 39) {
     rightPressed = true;
-  } else if (e.key == "Left" || e.key == "ArrowLeft") {
+  } else if (e.keyCode === 37) {
     leftPressed = true;
   }
 }
 
-//changes variables based on key presses
 function keyUpHandler(e) {
-  if (e.key == "Right" || e.key == "ArrowRight") {
+  if (e.keyCode === 39) {
     rightPressed = false;
-  } else if (e.key == "Left" || e.key == "ArrowLeft") {
+  } else if (e.keyCode === 37) {
     leftPressed = false;
   }
 }
-//track mouse movement
+// Track mouse movement
 function mouseMoveHandler(e) {
-  //distance between the canvas left edge and the mouse pointer
+  // Distance between the canvas left edge and the mouse pointer
   let relativeX = e.clientX - canvas.offsetLeft;
-  //if x is greater than 0 and lower than canvas width then the pointer is within canvas boundaries
-  if (relativeX > 0 && relativeX < canvas.width) {
+  // If x is greater than 0 and lower than canvas width then the pointer is within canvas boundaries
+  if (relativeX > 0 && relativeX < width) {
     paddleX = relativeX - paddleWidth / 2;
   }
 }
 
-//this function that will loop through all the bricks and compare every single brick's position with the ball's coordinates as each frame is drawn
+//----------------------------------------------------------------------
+// Functions
+//----------------------------------------------------------------------
+
+// Looping through all the bricks and compare brick's position with the ball's coordinates
 function collisionDetection() {
   for (let c = 0; c < brickColumnCount; c++) {
     for (let r = 0; r < brickRowCount; r++) {
-      let b = bricks[c][r];
-      //if the brick status is equal to 1 then we will do the collision check
-      if (b.status == 1) {
-        //for the center of the ball to be inside the brick, all these statements need to be true
+      let brick = bricks[c][r];
+      // If the brick status is equal to 1 then we will do the collision check
+      if (brick.status == 1) {
+        // For the center of the ball to be inside the brick, all these statements need to be true
         if (
-          x > b.x &&
-          x < b.x + brickWidth &&
-          y > b.y &&
-          y < b.y + brickHeight
+          ball.x > brick.x &&
+          ball.x < brick.x + brickWidth &&
+          ball.y > brick.y &&
+          ball.y < brick.y + brickHeight
         ) {
-          //once brick has been hit redirect the ball in the opposite direction
-          dy = -dy;
-          b.status = 0;
+          // Once brick has been hit redirect the ball in the opposite direction
+          ball.dy = -ball.dy;
+          brick.status = 0;
           score++;
-          //if all bricks have been destroyed then you win
+          // If all bricks have been destroyed then you win
           if (score == brickRowCount * brickColumnCount) {
             alert("YOU WIN, CONGRATS!");
             document.location.reload();
@@ -100,111 +131,132 @@ function collisionDetection() {
     }
   }
 }
-//drawing the ball
+// Drawing the ball
 function drawBall() {
   ctx.beginPath();
-  ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
-  ctx.fillStyle = "orange";
+  ctx.arc(ball.x, ball.y, ballRadius, 0, PI2);
+  ctx.fillStyle = ballColor;
   ctx.fill();
   ctx.closePath();
 }
 
-//drawing the paddle
+// Drawing the paddle
 function drawPaddle() {
   ctx.beginPath();
-  ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
-  ctx.fillStyle = "white";
+  ctx.rect(paddleX, height - paddleHeight, paddleWidth, paddleHeight);
+  ctx.fillStyle = paddleColor;
   ctx.fill();
   ctx.closePath();
 }
 
-//drawing the bricks
+// Drawing the bricks
 function drawBricks() {
-  //looping through all the bricks in the array and drawing them on the screen
   for (let c = 0; c < brickColumnCount; c++) {
     for (let r = 0; r < brickRowCount; r++) {
-      //if brick status is 1 then draw it - else it's been hit
+      // If brick status is 1 then draw it - else it's been hit
       if (bricks[c][r].status == 1) {
-        //work out the x and y positions of each brick for each loop iteration to draw the bricks
+        // Work out the x and y positions of each brick for each loop iteration to draw the bricks
         let brickX = r * (brickWidth + brickPadding) + brickOffsetLeft;
         let brickY = c * (brickHeight + brickPadding) + brickOffsetTop;
         bricks[c][r].x = brickX;
         bricks[c][r].y = brickY;
         ctx.beginPath();
         ctx.rect(brickX, brickY, brickWidth, brickHeight);
-        ctx.fillStyle = "blue";
+        ctx.fillStyle = bricksColor;
         ctx.fill();
         ctx.closePath();
       }
     }
   }
 }
-//create and update score display
+// Create and update score display
 function drawScore() {
   ctx.font = "16px Arial";
-  ctx.fillStyle = "white";
+  ctx.fillStyle = scoreColor;
   ctx.fillText("Score: " + score, 8, 20);
 }
-//drawing the life counter
+// Drawing the life counter
 function drawLives() {
   ctx.font = "16px Arial";
-  ctx.fillStyle = "white";
-  ctx.fillText("Lives: " + lives, canvas.width - 65, 20);
+  ctx.fillStyle = livesColor;
+  ctx.fillText("Lives: " + lives, width - 65, 20);
 }
 
-//handles the animation
+function resetBallAndPaddle() {
+  // Position of the ball
+  ball.x = width / 2;
+  ball.y = height - 30;
+  // Movement of the ball
+  ball.dx = 3;
+  ball.dy = -3;
+  // Position of the paddle
+  paddleX = paddleXStart;
+}
+
+function moveBall() {
+  ball.x += ball.dx;
+  ball.y += ball.dy;
+}
+
+function movePaddle() {
+  // Check for arrow keys
+  if (rightPressed && paddleX < width - paddleWidth) {
+    paddleX += 5;
+  } else if (leftPressed && paddleX > 0) {
+    paddleX -= 5;
+  }
+}
+
+function collisionsWithCanvasAndPaddle() {
+  // Ball bouncing off the left and right of the canvas
+  if (ball.x + ball.dx > width - ballRadius || ball.x + ball.dx < ballRadius) {
+    ball.dx = -ball.dx;
+  }
+  // Ball bouncing off the top
+  if (ball.y + ball.dy < ballRadius) {
+    ball.dy = -ball.dy;
+  } else if (ball.y + ball.dy > height - ballRadius) {
+    // Collision detection between the ball and the paddle
+    if (ball.x > paddleX && ball.x < paddleX + paddleWidth) {
+      ball.dy = -ball.dy;
+    } else {
+      lives--;
+      // If there are no lives left, the game is over
+      if (!lives) {
+        alert("GAME OVER");
+        document.location.reload();
+      } else {
+        // Reset the position of the ball and paddle - along with the movement of the ball
+        resetBallAndPaddle();
+      }
+    }
+  }
+}
+
+//----------------------------------------------------------------------
+// Game Loop - Handles the animation
+//----------------------------------------------------------------------
+
 function draw() {
-  //clearing the canvas before each frame
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  //the drawing calls
+  // Clearing the canvas
+  ctx.clearRect(0, 0, width, height);
+  // Calling helper functions
   drawBricks();
   drawBall();
   drawPaddle();
   drawScore();
   drawLives();
   collisionDetection();
+  moveBall();
+  movePaddle();
+  collisionsWithCanvasAndPaddle();
 
-  //ball bouncing off the left and right
-  if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
-    dx = -dx;
-  }
-  //ball bouncing off the top
-  if (y + dy < ballRadius) {
-    dy = -dy;
-  } else if (y + dy > canvas.height - ballRadius) {
-    //collision detection between the ball and the paddle
-    if (x > paddleX && x < paddleX + paddleWidth) {
-      dy = -dy;
-    } else {
-      lives--;
-      //if there are no lives left, the game is over
-      if (!lives) {
-        alert("GAME OVER");
-        document.location.reload();
-      } else {
-        //else reset the position of the ball and paddle - along with the movement of the ball
-        x = canvas.width / 2;
-        y = canvas.height - 30;
-        dx = 3;
-        dy = -3;
-        paddleX = (canvas.width - paddleWidth) / 2;
-      }
-    }
-  }
-
-  //moves paddle
-  if (rightPressed && paddleX < canvas.width - paddleWidth) {
-    paddleX += 5;
-  } else if (leftPressed && paddleX > 0) {
-    paddleX -= 5;
-  }
-  // updates position
-  x += dx;
-  y += dy;
-
-  //helps the browser render the game better than the fixed frame rate implemented with setInterval
-  //the draw function will call itself over and over again
+  // Draw the screen again
   requestAnimationFrame(draw);
 }
+
+// **************************************************
+// Starts program
+// **************************************************
 
 draw();
