@@ -155,35 +155,6 @@ function initialiseBricks() {
   }
 }
 
-// Looping through all the bricks and compare brick's position with the ball's coordinates
-function collisionDetection() {
-  for (let c = 0; c < brickColumnCount; c++) {
-    for (let r = 0; r < brickRowCount; r++) {
-      let brick = bricks[c][r];
-      // If the brick status is equal to 1 then we will do the collision check
-      if (brick.status == 1) {
-        // For the center of the ball to be inside the brick, all these statements need to be true
-        if (
-          ball.x > brick.x &&
-          ball.x < brick.x + brickWidth &&
-          ball.y > brick.y &&
-          ball.y < brick.y + brickHeight
-        ) {
-          // Once brick has been hit redirect the ball in the opposite direction
-          ball.dy = -ball.dy;
-          brick.status = 0;
-          score++;
-          // If all bricks have been destroyed then you win
-          if (score == brickRowCount * brickColumnCount) {
-            alert("YOU WIN, CONGRATS!");
-            document.location.reload();
-          }
-        }
-      }
-    }
-  }
-}
-
 // Drawing the paddle
 function drawPaddle() {
   ctx.beginPath();
@@ -227,6 +198,35 @@ function resetBallAndPaddle() {
   ball.dy = -3;
   // Position of the paddle
   paddleX = paddleXStart;
+}
+
+// Looping through all the bricks and compare brick's position with the ball's coordinates
+function collisionDetection() {
+  for (let c = 0; c < brickColumnCount; c++) {
+    for (let r = 0; r < brickRowCount; r++) {
+      let brick = bricks[c][r];
+      // If the brick status is equal to 1 then we will do the collision check
+      if (brick.status == 1) {
+        // For the center of the ball to be inside the brick, all these statements need to be true
+        if (
+          ball.x > brick.x &&
+          ball.x < brick.x + brickWidth &&
+          ball.y > brick.y &&
+          ball.y < brick.y + brickHeight
+        ) {
+          // Once brick has been hit redirect the ball in the opposite direction
+          ball.dy = -ball.dy;
+          brick.status = 0;
+          score++;
+          // If all bricks have been destroyed then you win
+          if (score == brickRowCount * brickColumnCount) {
+            alert("YOU WIN, CONGRATS!");
+            document.location.reload();
+          }
+        }
+      }
+    }
+  }
 }
 
 function moveBall() {
