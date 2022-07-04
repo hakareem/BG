@@ -4,7 +4,7 @@
 }
 
 body {
-  background: #e6fa04d6;
+  background: #ffffffd6;
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -12,7 +12,7 @@ body {
 }
 
 #myCanvas {
-  background: #000000;
+  background: #1414144f;
 }
 
 .startBtn {
@@ -23,4 +23,24 @@ body {
   background: #016cf1;
   color: #fff;
   font-family: Arial, sans-serif;
+}
+.btn-start {
+  color: #333;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 5px 20px;
+  background-color: #fefefe;
+  border: 2px solid #0095dd;
+  border-radius: 0.2rem;
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.btn-hide {
+  display: none;
 }

@@ -1,6 +1,7 @@
 //----------------------------------------------------------------------
 // DOM references
 //----------------------------------------------------------------------
+const startGameButton = document.querySelector(".btn-start");
 
 // Allows us to render graphics on the <canvas> element
 const canvas = document.getElementById("myCanvas");
@@ -14,7 +15,7 @@ const height = canvas.height;
 const ballRadius = 10;
 // Paddle variables
 const paddleHeight = 10;
-const paddleWidth = 75;
+const paddleWidth = 120;
 // Brick variables
 const brickRowCount = 8;
 const brickColumnCount = 4;
@@ -31,9 +32,9 @@ const gameWonMessage = "YOU WIN, CONGRATS!";
 // Game colours
 const ballColor = "yellow";
 const bricksColor = "lime";
-const paddleColor = "white";
-const livesColor = "white";
-const scoreColor = "white";
+const paddleColor = "black";
+const livesColor = "black";
+const scoreColor = "black";
 
 //----------------------------------------------------------------------
 // Classes
@@ -299,7 +300,7 @@ function draw() {
 // Starts program
 // **************************************************
 
-function startGame() {
-  document.getElementById("myCanvas").style.display = "block";
+startGameButton.addEventListener("click", () => {
+  startGameButton.classList.add("btn-hide");
   draw();
-}
+});
