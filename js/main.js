@@ -27,9 +27,10 @@ const brickOffsetLeft = 30;
 const paddleXStart = (width - paddleWidth) / 2;
 const PI2 = Math.PI * 2;
 const gameOverMessage = "Game Over!";
+const gameWonMessage = "YOU WIN, CONGRATS!";
 // Game colours
-const ballColor = "orange";
-const bricksColor = "blue";
+const ballColor = "yellow";
+const bricksColor = "lime";
 const paddleColor = "white";
 const livesColor = "white";
 const scoreColor = "white";
@@ -220,7 +221,7 @@ function collisionDetection() {
           score++;
           // If all bricks have been destroyed then you win
           if (score == brickRowCount * brickColumnCount) {
-            alert("YOU WIN, CONGRATS!");
+            alert(gameWonMessage);
             document.location.reload();
           }
         }
@@ -298,4 +299,7 @@ function draw() {
 // Starts program
 // **************************************************
 
-draw();
+function startGame() {
+  document.getElementById("myCanvas").style.display = "block";
+  draw();
+}

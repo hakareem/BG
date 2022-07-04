@@ -14,3 +14,13 @@ body {
 #myCanvas {
   background: #000000;
 }
+
+.startBtn {
+  position: relative;
+  bottom: 180px;
+  left: 280px;
+  padding: 10px 35px;
+  background: #016cf1;
+  color: #fff;
+  font-family: Arial, sans-serif;
+}
