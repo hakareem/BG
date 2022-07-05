@@ -3,9 +3,15 @@
 //----------------------------------------------------------------------
 const startGameButton = document.querySelector(".btn-start");
 
-// Allows us to render graphics on the <canvas> element
+// Render graphics on the canvas element
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
+
+//----------------------------------------------------------------------
+// Audio references
+//----------------------------------------------------------------------
+const breakSound = document.getElementById("breakingBrick");
+const lostALifeSound = document.getElementById("losingLives");
 
 //----------------------------------------------------------------------
 // Constant Variables
@@ -31,10 +37,17 @@ const gameOverMessage = "Game Over!";
 const gameWonMessage = "YOU WIN, CONGRATS!";
 // Game colours
 const ballColor = "yellow";
-const bricksColor = "lime";
-const paddleColor = "black";
-const livesColor = "black";
-const scoreColor = "black";
+const paddleColor = "white";
+const livesColor = "white";
+const scoreColor = "white";
+const brickColors = [
+  "#284FB6",
+  "#901FD8",
+  "#D81F1F",
+  "#32CD32",
+  "#D8C91F",
+  "#1FD88C",
+];
 
 //----------------------------------------------------------------------
 // Classes
@@ -76,7 +89,7 @@ class Brick {
   drawBricks(ctx) {
     ctx.beginPath();
     ctx.rect(this.x, this.y, this.width, this.height);
-    ctx.fillStyle = bricksColor;
+    ctx.fillStyle = this.color;
     ctx.fill();
     ctx.closePath();
   }
@@ -151,7 +164,7 @@ function initialiseBricks() {
         brickY,
         brickWidth,
         brickHeight,
-        bricksColor
+        brickColors[c]
       );
     }
   }
@@ -178,12 +191,14 @@ function drawBricks() {
     }
   }
 }
+
 // Create and update score display
 function drawScore() {
   ctx.font = "16px Arial";
   ctx.fillStyle = scoreColor;
   ctx.fillText("Score: " + score, 8, 20);
 }
+
 // Drawing the life counter
 function drawLives() {
   ctx.font = "16px Arial";
@@ -216,6 +231,8 @@ function collisionDetection() {
           ball.y > brick.y &&
           ball.y < brick.y + brickHeight
         ) {
+          breakSound.volume = 0.2;
+          breakSound.play();
           // Once brick has been hit redirect the ball in the opposite direction
           ball.dy = -ball.dy;
           brick.status = 0;
@@ -261,6 +278,8 @@ function collisionsWithCanvasAndPaddle() {
     if (ball.x > paddleX && ball.x < paddleX + paddleWidth) {
       ball.dy = -ball.dy;
     } else {
+      lostALifeSound.volume = 0.2;
+      lostALifeSound.play();
       lives--;
       // If there are no lives left, the game is over
       if (!lives) {
