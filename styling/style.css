@@ -12,18 +12,19 @@ body {
 }
 
 #myCanvas {
-  background: #1414144f;
+  display: block;
+  margin: 0 auto;
+  background-color: rgb(0, 0, 0);
 }
 
-.startBtn {
-  position: relative;
-  bottom: 180px;
-  left: 280px;
-  padding: 10px 35px;
-  background: #016cf1;
-  color: #fff;
-  font-family: Arial, sans-serif;
+main {
+  width: 480;
+  height: 320;
+  margin: 0 auto;
+  padding: 4px;
+  background: linear-gradient(45deg, #ffd800, #ff5520, #750cf2, #0cbcf2);
 }
+
 .btn-start {
   color: #333;
   font-family: Arial, Helvetica, sans-serif;
