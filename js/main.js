@@ -10,12 +10,6 @@ const ctx = canvas.getContext("2d");
 //----------------------------------------------------------------------
 // Audio references
 //----------------------------------------------------------------------
-window.addEventListener("DOMContentLoaded", (event) => {
-  const audio = document.querySelector("#background");
-  audio.volume = 0.2;
-  audio.play();
-});
-
 const breakSound = document.getElementById("breakingBrick");
 const lostALifeSound = document.getElementById("losingLives");
 
@@ -327,5 +321,8 @@ function draw() {
 
 startGameButton.addEventListener("click", () => {
   startGameButton.classList.add("btn-hide");
+  const audio = document.querySelector("#background");
+  audio.volume = 0.2;
+  audio.play();
   draw();
 });
