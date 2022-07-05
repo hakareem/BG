@@ -24,7 +24,7 @@ const paddleHeight = 10;
 const paddleWidth = 120;
 // Brick variables
 const brickRowCount = 8;
-const brickColumnCount = 4;
+const brickColumnCount = 8;
 const brickWidth = 45;
 const brickHeight = 20;
 const brickPadding = 10;
@@ -42,11 +42,13 @@ const livesColor = "white";
 const scoreColor = "white";
 const brickColors = [
   "#284FB6",
+  "#DE3163",
   "#901FD8",
-  "#D81F1F",
   "#32CD32",
-  "#D8C91F",
-  "#1FD88C",
+  "#FFBF00",
+  "#CCCCFF",
+  "#40E0D0",
+  "#D81F1F",
 ];
 
 //----------------------------------------------------------------------
