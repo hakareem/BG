@@ -88,7 +88,7 @@ class Brick {
     this.height = height;
     this.color = color;
   }
-  drawBricks(ctx) {
+  drawBrick(ctx) {
     ctx.beginPath();
     ctx.rect(this.x, this.y, this.width, this.height);
     ctx.fillStyle = this.color;
@@ -96,6 +96,48 @@ class Brick {
     ctx.closePath();
   }
 }
+
+class Bricks {
+  constructor(cols, rows) {
+    this.cols = cols;
+    this.rows = rows;
+    this.bricks = [];
+    this.initialise();
+  }
+
+  initialise() {
+    for (let c = 0; c < this.cols; c++) {
+      this.bricks[c] = [];
+      for (let r = 0; r < this.rows; r++) {
+        // Work out the x and y positions of each brick for each loop iteration to draw the bricks
+        let brickX = r * (brickWidth + brickPadding) + brickOffsetLeft;
+        let brickY = c * (brickHeight + brickPadding) + brickOffsetTop;
+        // Status parameter to indicate whether I want to paint each brick on the screen or not
+        this.bricks[c][r] = new Brick(
+          brickX,
+          brickY,
+          brickWidth,
+          brickHeight,
+          brickColors[c]
+        );
+      }
+    }
+  }
+
+  drawBricks() {
+    for (let c = 0; c < this.cols; c++) {
+      for (let r = 0; r < this.rows; r++) {
+        const brick = this.bricks[c][r];
+        // If brick status is 1 then draw it - else it's been hit
+        if (brick.status == 1) {
+          brick.drawBrick(ctx);
+        }
+      }
+    }
+  }
+}
+
+const bricks = new Bricks(brickColumnCount, brickRowCount);
 
 //----------------------------------------------------------------------
 // Let Variables
@@ -108,13 +150,6 @@ let lives = 5;
 // Button control variables
 let rightPressed = false;
 let leftPressed = false;
-
-//----------------------------------------------------------------------
-// Setup Bricks Array
-//----------------------------------------------------------------------
-
-const bricks = [];
-initialiseBricks();
 
 //----------------------------------------------------------------------
 // Event listeners
@@ -153,25 +188,6 @@ function mouseMoveHandler(e) {
 // Functions
 //----------------------------------------------------------------------
 
-function initialiseBricks() {
-  for (let c = 0; c < brickColumnCount; c++) {
-    bricks[c] = [];
-    for (let r = 0; r < brickRowCount; r++) {
-      // Work out the x and y positions of each brick for each loop iteration to draw the bricks
-      let brickX = r * (brickWidth + brickPadding) + brickOffsetLeft;
-      let brickY = c * (brickHeight + brickPadding) + brickOffsetTop;
-      // Status parameter to indicate whether I want to paint each brick on the screen or not
-      bricks[c][r] = new Brick(
-        brickX,
-        brickY,
-        brickWidth,
-        brickHeight,
-        brickColors[c]
-      );
-    }
-  }
-}
-
 // Drawing the paddle
 function drawPaddle() {
   ctx.beginPath();
@@ -179,19 +195,6 @@ function drawPaddle() {
   ctx.fillStyle = paddleColor;
   ctx.fill();
   ctx.closePath();
-}
-
-// Drawing the bricks
-function drawBricks() {
-  for (let c = 0; c < brickColumnCount; c++) {
-    for (let r = 0; r < brickRowCount; r++) {
-      const brick = bricks[c][r];
-      // If brick status is 1 then draw it - else it's been hit
-      if (brick.status == 1) {
-        brick.drawBricks(ctx);
-      }
-    }
-  }
 }
 
 // Create and update score display
@@ -221,9 +224,9 @@ function resetBallAndPaddle() {
 
 // Looping through all the bricks and compare brick's position with the ball's coordinates
 function collisionDetection() {
-  for (let c = 0; c < brickColumnCount; c++) {
-    for (let r = 0; r < brickRowCount; r++) {
-      let brick = bricks[c][r];
+  for (let c = 0; c < bricks.cols; c++) {
+    for (let r = 0; r < bricks.rows; r++) {
+      let brick = bricks.bricks[c][r];
       // If the brick status is equal to 1 then we will do the collision check
       if (brick.status == 1) {
         // For the center of the ball to be inside the brick, all these statements need to be true
@@ -303,7 +306,7 @@ function draw() {
   // Clearing the canvas
   ctx.clearRect(0, 0, width, height);
   // Calling helper functions
-  drawBricks();
+  bricks.drawBricks(ctx);
   ball.drawBall(ctx);
   drawPaddle();
   drawScore();
