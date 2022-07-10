@@ -267,7 +267,7 @@ function movePaddle() {
   }
 }
 
-function collisionsWithCanvasAndPaddle() {
+function canvasRightAndLeftCollision() {
   // Ball bouncing off the left and right of the canvas
   if (
     ball.x + ball.dx > width - ball.radius ||
@@ -275,10 +275,17 @@ function collisionsWithCanvasAndPaddle() {
   ) {
     ball.dx = -ball.dx;
   }
+}
+
+function canvasTopCollision() {
   // Ball bouncing off the top
   if (ball.y + ball.dy < ball.radius) {
     ball.dy = -ball.dy;
-  } else if (ball.y + ball.dy > height - ball.radius) {
+  }
+}
+
+function canvasBottomAndPaddleCollision() {
+  if (ball.y + ball.dy > height - ball.radius) {
     // Collision detection between the ball and the paddle
     if (ball.x > paddleX && ball.x < paddleX + paddleWidth) {
       ball.dy = -ball.dy;
@@ -296,6 +303,12 @@ function collisionsWithCanvasAndPaddle() {
       }
     }
   }
+}
+
+function collisionsWithCanvasAndPaddle() {
+  canvasRightAndLeftCollision();
+  canvasTopCollision();
+  canvasBottomAndPaddleCollision();
 }
 
 //----------------------------------------------------------------------
